@@ -39,16 +39,14 @@ public class OrderService {
                 .map(OrderLineItems::getSkuCode)
                 .toList();
 
-        // Call Inventory Service, and place order if product is in
-        // stock
-        InventoryResponse[] inventoryResponsArray = webClient.get()
-                .uri("http://localhost:8082/api/inventory",
+        InventoryResponse[] inventoryResponses = webClient.get()
+                .uri("http://inventory-service/api/inventory",
                         uriBuilder -> uriBuilder.queryParam("skuCode", skuCodes).build())
                 .retrieve()
                 .bodyToMono(InventoryResponse[].class)
                 .block();
 
-        boolean allProductsInStock = Arrays.stream(inventoryResponsArray)
+        boolean allProductsInStock = Arrays.stream(inventoryResponses)
                 .allMatch(InventoryResponse::isInStock);
 
         if (allProductsInStock) {
